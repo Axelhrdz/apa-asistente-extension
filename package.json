@@ -5,10 +5,12 @@
   "description": "APA Asistente — Chrome extension + Express API",
   "workspaces": [
     "backend",
-    "extension"
+    "extension",
+    "frontend"
   ],
   "scripts": {
     "dev:api": "npm run dev -w backend",
+    "dev:web": "npm run dev -w frontend",
     "start:api": "npm run start -w backend",
     "import:excel": "npm run import:excel -w backend"
   }

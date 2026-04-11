@@ -14,9 +14,13 @@ export function createApp() {
     cors({
       origin(origin, cb) {
         if (!origin) return cb(null, true);
+        // Background fetch from the MV3 service worker sends Origin: chrome-extension://…
+        if (origin.startsWith("chrome-extension://")) return cb(null, true);
         if (config.allowedOrigins.length === 0) return cb(null, true);
         if (config.allowedOrigins.includes(origin)) return cb(null, true);
-        return cb(new Error("Not allowed by CORS"));
+        const err = new Error("Not allowed by CORS");
+        err.status = 403;
+        return cb(err);
       },
       credentials: true,
     })
