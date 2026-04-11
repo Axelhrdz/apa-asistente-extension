@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "APA Asistente",
+  "version": "0.1.0",
+  "description": "In-page assistant and account hints for APA workflows.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "http://localhost:5173/*",
+    "http://127.0.0.1:5173/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:5173/*", "http://127.0.0.1:5173/*"],
+      "js": ["src/content/account-hints.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "APA Asistente"
+  }
+}

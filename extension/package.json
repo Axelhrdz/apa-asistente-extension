@@ -1,0 +1,9 @@
+{
+  "name": "apa-asistente-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension (MV3) — load unpacked from this folder.",
+  "scripts": {
+    "lint": "echo \"Add ESLint when ready\""
+  }
+}

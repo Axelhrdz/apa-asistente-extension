@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "import:excel": "node scripts/import-accounts-from-excel.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "mongodb": "^7.1.1",
+    "xlsx": "^0.18.5"
   }
 }

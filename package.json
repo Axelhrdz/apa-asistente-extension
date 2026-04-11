@@ -1,0 +1,15 @@
+{
+  "name": "apa-asistente",
+  "version": "0.1.0",
+  "private": true,
+  "description": "APA Asistente — Chrome extension + Express API",
+  "workspaces": [
+    "backend",
+    "extension"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w backend",
+    "start:api": "npm run start -w backend",
+    "import:excel": "npm run import:excel -w backend"
+  }
+}
