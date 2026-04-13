@@ -1,2 +1,5 @@
-/** Default API base; override via chrome.storage if you add an options page later. */
-export const DEFAULT_API_BASE = "http://localhost:3000";
+/**
+ * Default API base for production.
+ * Uses the Render default domain wildcard allowed in manifest host_permissions.
+ */
+export const DEFAULT_API_BASE = "https://apa-asistente-api.onrender.com";

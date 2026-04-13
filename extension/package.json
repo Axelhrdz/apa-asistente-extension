@@ -1,9 +1,10 @@
 {
   "name": "apa-asistente-extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Chrome extension (MV3) — load unpacked from this folder.",
   "scripts": {
-    "lint": "echo \"Add ESLint when ready\""
+    "lint": "echo \"Add ESLint when ready\"",
+    "pack": "rm -f ../release/apa-asistente-extension-v0.1.1.zip && zip -r ../release/apa-asistente-extension-v0.1.1.zip . -x \"*.DS_Store\" \"*/.DS_Store\""
   }
 }
