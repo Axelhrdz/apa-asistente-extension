@@ -11,6 +11,7 @@
   "scripts": {
     "dev:api": "npm run dev -w backend",
     "dev:web": "npm run dev -w frontend",
+    "start": "npm run start -w backend",
     "start:api": "npm run start -w backend",
     "import:excel": "npm run import:excel -w backend"
   }
