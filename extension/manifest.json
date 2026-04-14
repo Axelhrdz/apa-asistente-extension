@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "APA Asistente",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "In-page assistant and account hints for APA workflows.",
   "permissions": ["storage"],
   "host_permissions": [
+    "https://*.onrender.com/*",
     "http://localhost:5173/*",
     "http://127.0.0.1:5173/*",
     "http://172.31.11.87:8080/*",

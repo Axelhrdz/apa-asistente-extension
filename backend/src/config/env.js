@@ -14,7 +14,7 @@ export const config = {
   port: Number(process.env.PORT) || 3000,
   allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
   mongoUri: process.env.MONGODB_URI || null,
-  mongoDbName: process.env.MONGO_DB_NAME || "apa_asistente",
+  mongoDbName: process.env.MONGO_DB_NAME || "apa_asistente_extension",
   mongoCollectionAccounts:
     process.env.MONGO_COLLECTION_ACCOUNTS || "accounts_rec_banios",
 };
