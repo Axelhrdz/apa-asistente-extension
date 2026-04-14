@@ -7,15 +7,12 @@ export const postAccountLookup = asyncHandler(async (req, res) => {
     req.body?.accountNumber
   );
 
-  if (!record) {
-    if (!config.mongoUri) {
-      return res.status(501).json({
-        error: "Account lookup not fully configured",
-        message: "Set MONGODB_URI in backend/.env and run the Excel import script",
-        received: normalized,
-      });
-    }
-    return res.status(404).json({ error: "Account not found", received: normalized });
+  if (!config.mongoUri) {
+    return res.status(501).json({
+      error: "Account lookup not fully configured",
+      message: "Set MONGODB_URI in backend/.env and run the Excel import script",
+      received: normalized,
+    });
   }
 
   return res.json({ data: record });

@@ -17,4 +17,6 @@ export const config = {
   mongoDbName: process.env.MONGO_DB_NAME || "apa_asistente_extension",
   mongoCollectionAccounts:
     process.env.MONGO_COLLECTION_ACCOUNTS || "accounts_rec_banios",
+  mongoCollectionRecibos:
+    process.env.MONGO_COLLECTION_RECIBOS || "recibos_agua_2025",
 };
