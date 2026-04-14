@@ -18,3 +18,10 @@ export async function getAccountsCollection() {
   const db = cli.db(config.mongoDbName);
   return db.collection(config.mongoCollectionAccounts);
 }
+
+export async function getRecibosCollection() {
+  const cli = await getMongoClient();
+  if (!cli) return null;
+  const db = cli.db(config.mongoDbName);
+  return db.collection(config.mongoCollectionRecibos);
+}
