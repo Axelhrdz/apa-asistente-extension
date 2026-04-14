@@ -5,4 +5,6 @@
 export const MESSAGE_TYPES = {
   /** Payload: { clave: string } */
   LOOKUP_ACCOUNT: "apa/lookup_account",
+  /** Payload: { clave: string } */
+  LOOKUP_RECIBOS: "apa/lookup_recibos",
 };

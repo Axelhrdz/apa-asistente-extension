@@ -1,5 +1,6 @@
 import { normalizeClaveApa } from "../lib/claveApa.js";
 import { accountRepository } from "../repositories/account.repository.js";
+import { reciboService } from "./recibo.service.js";
 
 function parseAccountNumber(accountNumber) {
   if (accountNumber == null) {
@@ -32,7 +33,32 @@ export const accountService = {
    */
   async lookupAccount(accountNumber) {
     const { normalized } = parseAccountNumber(accountNumber);
+    const recibos = await reciboService.lookupRecibosByClaveApa(normalized);
     const record = await accountRepository.findByClaveApa(normalized);
-    return { normalized, record };
+    if (!record) {
+      return {
+        normalized,
+        record: {
+          clave_apa: normalized,
+          tipo_tarifa_old: null,
+          tipo_tarifa_new: null,
+          rec_old: null,
+          rec_new: null,
+          banios_old: null,
+          banios_new: null,
+          accountFound: false,
+          recibos,
+        },
+      };
+    }
+
+    return {
+      normalized,
+      record: {
+        ...record,
+        accountFound: true,
+        recibos,
+      },
+    };
   },
 };

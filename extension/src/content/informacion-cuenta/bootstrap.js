@@ -1,10 +1,10 @@
 /**
- * Content script entry for cuenta.html — reads clave from DOM and asks the
- * background worker to call the API. Message type must match
- * extension/src/lib/messages.js (MESSAGE_TYPES.LOOKUP_ACCOUNT).
+ * Content script entry — reads clave from DOM, asks background for account + recibos,
+ * and ALWAYS renders both tabs (each with its own empty state if data is missing).
  */
 (function () {
   var MSG_LOOKUP = "apa/lookup_account";
+  var MSG_LOOKUP_RECIBOS = "apa/lookup_recibos";
   var LOOKUP_TIMEOUT_MS = 7000;
   var LOOKUP_INTERVAL_MS = 350;
   var hasRunLookup = false;
@@ -20,20 +20,13 @@
     return params.get("m") === "2" && params.get("a") === "2" && params.get("ac") === "consulta";
   }
 
-  function isSupportedView() {
-    return isLocalCuentaView() || isExternalConsultaView();
-  }
-
-  if (!isSupportedView()) {
-    return;
-  }
+  if (!isLocalCuentaView() && !isExternalConsultaView()) return;
 
   function getClaveFromPage() {
     var el = document.querySelector("[data-account-clave]");
     var fromDom = el && el.textContent ? el.textContent.trim() : "";
     if (fromDom) return fromDom;
 
-    // External system path: value is in <input name="clave_apa" ... readonly>.
     var input = document.querySelector("td.datoCampo input[name='clave_apa'], input[name='clave_apa']");
     var fromInput = input && input.value ? input.value.trim() : "";
     if (fromInput) return fromInput;
@@ -47,37 +40,57 @@
     return "";
   }
 
+  function sendMsg(type, clave, cb) {
+    chrome.runtime.sendMessage({ type: type, clave: clave }, function (resp) {
+      if (chrome.runtime.lastError) return cb(null);
+      cb(resp);
+    });
+  }
+
   function runLookup(clave) {
     if (hasRunLookup) return;
     if (!clave) return;
     hasRunLookup = true;
 
-    chrome.runtime.sendMessage({ type: MSG_LOOKUP, clave: clave }, function (response) {
-      if (chrome.runtime.lastError) {
-        ApaHintUI.showError(clave, 0, chrome.runtime.lastError.message, null);
-        return;
-      }
-      if (!response) {
-        ApaHintUI.showError(
-          clave,
-          0,
-          "No response from the extension background. Reload the extension and this page.",
-          null
-        );
-        return;
+    var accountData = null;
+    var recibosData = null;
+    var done = 0;
+
+    function tryRender() {
+      done++;
+      if (done < 2) return;
+
+      var record = {};
+      if (accountData && accountData.ok && accountData.body && accountData.body.data) {
+        record = accountData.body.data;
+      } else {
+        record.accountFound = false;
       }
 
-      if (response.ok && response.body && response.body.data) {
-        ApaHintUI.showSuccess(clave, response.body.data);
-        return;
+      record.clave_apa = record.clave_apa || clave;
+
+      if (!Array.isArray(record.recibos)) {
+        record.recibos = [];
       }
 
-      ApaHintUI.showError(
-        clave,
-        response.status || 0,
-        response.message || "Error",
-        response.data || null
-      );
+      if (recibosData && recibosData.ok && recibosData.body && recibosData.body.data) {
+        var reciboArr = recibosData.body.data.recibos;
+        if (Array.isArray(reciboArr) && reciboArr.length > 0) {
+          record.recibos = reciboArr;
+        }
+      }
+
+      ApaHintUI.showSuccess(clave, record);
+    }
+
+    sendMsg(MSG_LOOKUP, clave, function (resp) {
+      accountData = resp;
+      tryRender();
+    });
+
+    sendMsg(MSG_LOOKUP_RECIBOS, clave, function (resp) {
+      recibosData = resp;
+      tryRender();
     });
   }
 
