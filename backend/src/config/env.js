@@ -9,6 +9,14 @@ function parseAllowedOrigins(raw) {
     .filter(Boolean);
 }
 
+function parseCollectionNames(raw, fallback) {
+  const names = (raw || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return names.length > 0 ? names : [fallback];
+}
+
 export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT) || 3000,
@@ -19,4 +27,8 @@ export const config = {
     process.env.MONGO_COLLECTION_ACCOUNTS || "accounts_rec_banios",
   mongoCollectionRecibos:
     process.env.MONGO_COLLECTION_RECIBOS || "recibos_agua_2025",
+  mongoCollectionRecibosList: parseCollectionNames(
+    process.env.MONGO_COLLECTION_RECIBOS,
+    "recibos_agua_2025"
+  ),
 };

@@ -25,3 +25,10 @@ export async function getRecibosCollection() {
   const db = cli.db(config.mongoDbName);
   return db.collection(config.mongoCollectionRecibos);
 }
+
+export async function getRecibosCollections() {
+  const cli = await getMongoClient();
+  if (!cli) return [];
+  const db = cli.db(config.mongoDbName);
+  return (config.mongoCollectionRecibosList || []).map((name) => db.collection(name));
+}
