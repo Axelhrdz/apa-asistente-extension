@@ -7,33 +7,59 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === MESSAGE_TYPES.LOOKUP_ACCOUNT && message.clave) {
-    postAccountLookup(String(message.clave).trim())
-      .then((body) => {
-        sendResponse({ ok: true, body });
+    const clave = String(message.clave).trim();
+    Promise.all([postAccountLookup(clave), getResolvedBase()])
+      .then(([body, apiBase]) => {
+        sendResponse({ ok: true, body, apiBase });
       })
       .catch((err) => {
-        sendResponse({
-          ok: false,
-          message: err.message,
-          status: err.status,
-          data: err.data,
-        });
+        getResolvedBase()
+          .then((apiBase) => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+              apiBase,
+            });
+          })
+          .catch(() => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+            });
+          });
       });
     return true;
   }
 
   if (message?.type === MESSAGE_TYPES.LOOKUP_RECIBOS && message.clave) {
-    getAccountRecibos(String(message.clave).trim())
-      .then((body) => {
-        sendResponse({ ok: true, body });
+    const clave = String(message.clave).trim();
+    Promise.all([getAccountRecibos(clave), getResolvedBase()])
+      .then(([body, apiBase]) => {
+        sendResponse({ ok: true, body, apiBase });
       })
       .catch((err) => {
-        sendResponse({
-          ok: false,
-          message: err.message,
-          status: err.status,
-          data: err.data,
-        });
+        getResolvedBase()
+          .then((apiBase) => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+              apiBase,
+            });
+          })
+          .catch(() => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+            });
+          });
       });
     return true;
   }

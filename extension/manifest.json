@@ -1,13 +1,19 @@
 {
   "manifest_version": 3,
   "name": "APA Asistente",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "In-page assistant and account hints for APA workflows.",
   "permissions": ["storage"],
   "host_permissions": [
     "https://*.onrender.com/*",
+    "https://apa-asistente.site/*",
+    "https://*.ngrok-free.app/*",
+    "https://*.ngrok-free.dev/*",
+    "https://*.ngrok.io/*",
     "http://localhost:5173/*",
     "http://127.0.0.1:5173/*",
+    "http://localhost:8080/*",
+    "http://127.0.0.1:8080/*",
     "http://172.31.11.87:8080/*",
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*"
@@ -21,6 +27,8 @@
       "matches": [
         "http://localhost:5173/*",
         "http://127.0.0.1:5173/*",
+        "http://localhost:8080/*",
+        "http://127.0.0.1:8080/*",
         "http://172.31.11.87:8080/*"
       ],
       "js": [

@@ -75,11 +75,7 @@ var ApaHintUI = (function () {
 
       R + " .apa-tabs{display:flex;gap:6px;margin:0 0 10px;}",
       R + " .apa-tab-btn{appearance:none;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;",
-      "padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;}",
-      R + " .apa-tab-btn:hover{background:#eef2f7;color:#1e293b;}",
-      R + " .apa-tab-btn[aria-selected='true']{background:#e2e8f0;border-color:#94a3b8;color:#0f172a;}",
-      R + " .apa-tab-btn:focus-visible{outline:2px solid #2563eb;outline-offset:2px;}",
-      R + " .apa-tab-panel{display:none;}",
+      "padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;apiBase
       R + " .apa-tab-panel.apa-tab-panel--active{display:block;}",
 
       R + " .apa-hint-clave{margin:0 0 8px;padding:10px 12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;}",
@@ -129,6 +125,16 @@ var ApaHintUI = (function () {
       R + " .apa-concepto-total{color:#0f172a;font-weight:500;white-space:nowrap;}",
 
       R + " .apa-hint-panel .apa-hint-meta{font-size:11px;color:#64748b;margin:8px 0 0;font-weight:400;}",
+      R + " .apa-hint-build{font-size:10px;font-weight:600;color:#64748b;margin:0 0 6px;letter-spacing:.03em;}",
+      R + " .apa-hint-local-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#ecfdf5;color:#047857;border:1px solid #6ee7b7;}",
+      R + " .apa-hint-ngrok-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#eff6ff;color:#1d4ed8;border:1px solid #93c5fd;}",
+      R + " .apa-hint-api-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;}",
       "@media (prefers-reduced-motion:reduce){",
       R + " .apa-hint-flag," + R + " .apa-hint-panel{transition-duration:.01ms;}}",
     ].join("");
@@ -582,10 +588,52 @@ var ApaHintUI = (function () {
 
   /* ── Public API ── */
 
+  function buildApiPill(apiBase) {
+    if (!apiBase || typeof apiBase !== "string") return null;
+    var pill = document.createElement("p");
+    pill.setAttribute("role", "status");
+    var b = apiBase.toLowerCase();
+    if (
+      b.indexOf("127.0.0.1") !== -1 ||
+      b.indexOf("localhost") !== -1 ||
+      b.indexOf("0.0.0.0") !== -1
+    ) {
+      pill.className = "apa-hint-local-pill";
+      pill.textContent = "API en este equipo · " + apiBase;
+    } else if (b.indexOf("ngrok") !== -1) {
+      pill.className = "apa-hint-ngrok-pill";
+      pill.textContent = "API servidor Linux (ngrok) · " + apiBase;
+    } else {
+      pill.className = "apa-hint-api-pill";
+      pill.textContent = "API · " + apiBase;
+    }
+    return pill;
+  }
+
+  function prependBuildAndApiStrip(panel, options) {
+    var manifest =
+      typeof chrome !== "undefined" &&
+      chrome.runtime &&
+      chrome.runtime.getManifest
+        ? chrome.runtime.getManifest()
+        : null;
+    var buildLine = document.createElement("p");
+    buildLine.className = "apa-hint-build";
+    buildLine.textContent = manifest
+      ? "Extensión v" + manifest.version + " (build Linux / MV3)"
+      : "APA Asistente";
+    panel.appendChild(buildLine);
+
+    var apiBase = options && options.apiBase ? String(options.apiBase) : "";
+    var pill = buildApiPill(apiBase);
+    if (pill) panel.appendChild(pill);
+  }
+
   return {
-    showSuccess: function (_clave, record) {
+    showSuccess: function (_clave, record, options) {
       mountRoot(function (panel) {
         prependPanelHeader(panel, "APA Asistente");
+        prependBuildAndApiStrip(panel, options);
 
         var lead = document.createElement("p");
         lead.className = "apa-hint-lead";
@@ -601,9 +649,10 @@ var ApaHintUI = (function () {
       }, "success");
     },
 
-    showError: function (clave, status, message, data) {
+    showError: function (clave, status, message, data, options) {
       mountRoot(function (panel) {
         prependPanelHeader(panel, "APA Asistente");
+        prependBuildAndApiStrip(panel, options || {});
 
         var p = document.createElement("p");
         p.className = "apa-hint-lead";

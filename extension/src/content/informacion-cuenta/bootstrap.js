@@ -60,6 +60,36 @@
       done++;
       if (done < 2) return;
 
+      if (!accountData && !recibosData) {
+        ApaHintUI.showError(
+          clave,
+          0,
+          "La extensión no respondió. Prueba Recargar en chrome://extensions.",
+          null,
+          {}
+        );
+        return;
+      }
+
+      var accOk = accountData && accountData.ok;
+      var recOk = recibosData && recibosData.ok;
+      if (!accOk && !recOk) {
+        var err = accountData && !accountData.ok ? accountData : recibosData;
+        var apiBase =
+          (err && err.apiBase) ||
+          (accountData && accountData.apiBase) ||
+          (recibosData && recibosData.apiBase) ||
+          "";
+        ApaHintUI.showError(
+          clave,
+          err && err.status,
+          (err && err.message) || "No se pudo obtener la información.",
+          err && err.data,
+          { apiBase: apiBase }
+        );
+        return;
+      }
+
       var record = {};
       if (accountData && accountData.ok && accountData.body && accountData.body.data) {
         record = accountData.body.data;
@@ -80,7 +110,11 @@
         }
       }
 
-      ApaHintUI.showSuccess(clave, record);
+      var apiBase =
+        (accountData && accountData.apiBase) ||
+        (recibosData && recibosData.apiBase) ||
+        "";
+      ApaHintUI.showSuccess(clave, record, { apiBase: apiBase });
     }
 
     sendMsg(MSG_LOOKUP, clave, function (resp) {

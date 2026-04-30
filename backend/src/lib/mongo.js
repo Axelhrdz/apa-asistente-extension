@@ -6,8 +6,9 @@ let client;
 export async function getMongoClient() {
   if (!config.mongoUri) return null;
   if (!client) {
-    client = new MongoClient(config.mongoUri);
-    await client.connect();
+    const next = new MongoClient(config.mongoUri);
+    await next.connect();
+    client = next;
   }
   return client;
 }
