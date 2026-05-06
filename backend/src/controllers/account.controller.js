@@ -17,3 +17,18 @@ export const postAccountLookup = asyncHandler(async (req, res) => {
 
   return res.json({ data: record });
 });
+
+export const getPadronOld = asyncHandler(async (req, res) => {
+  const { accountNumber } = req.params;
+  const { normalized, record } = await accountService.lookupPadronOld(accountNumber);
+
+  if (!config.mongoUri) {
+    return res.status(501).json({
+      error: "Padron lookup not fully configured",
+      message: "Set MONGODB_URI in backend/.env",
+      received: normalized,
+    });
+  }
+
+  return res.json({ data: record });
+});

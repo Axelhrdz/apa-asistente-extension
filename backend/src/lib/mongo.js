@@ -33,3 +33,10 @@ export async function getRecibosCollections() {
   const db = cli.db(config.mongoDbName);
   return (config.mongoCollectionRecibosList || []).map((name) => db.collection(name));
 }
+
+export async function getPadronOldCollection() {
+  const cli = await getMongoClient();
+  if (!cli) return null;
+  const db = cli.db(config.mongoDbNameWeb);
+  return db.collection(config.mongoCollectionPadronOld);
+}

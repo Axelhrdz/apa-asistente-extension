@@ -45,3 +45,36 @@ export async function postAccountLookup(accountNumber) {
 export function getConfiguredApiBase() {
   return getExtensionApiBase();
 }
+
+/**
+ * @param {string} accountNumber
+ * @returns {Promise<object>} API JSON body (expects `{ data: record }`)
+ */
+export async function getPadronOld(accountNumber) {
+  const base = getExtensionApiBase();
+  const safe = encodeURIComponent(String(accountNumber || "").trim());
+  const res = await fetch(`${base}/api/accounts/${safe}/padron-old`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+  });
+
+  let body = null;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+
+  if (!res.ok) {
+    const msg =
+      body?.message ||
+      body?.error ||
+      `Error ${res.status} al consultar el padrón`;
+    const err = new Error(msg);
+    err.status = res.status;
+    err.body = body;
+    throw err;
+  }
+
+  return body;
+}

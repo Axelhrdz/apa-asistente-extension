@@ -1,6 +1,7 @@
 import { normalizeClaveApa } from "../lib/claveApa.js";
 import { accountRepository } from "../repositories/account.repository.js";
 import { reciboService } from "./recibo.service.js";
+import { padronOldRepository } from "../repositories/padronOld.repository.js";
 
 function parseAccountNumber(accountNumber) {
   if (accountNumber == null) {
@@ -59,6 +60,19 @@ export const accountService = {
         accountFound: true,
         recibos,
       },
+    };
+  },
+
+  /**
+   * @param {unknown} accountNumber
+   * @returns {Promise<{ normalized: string, record: object | null }>}
+   */
+  async lookupPadronOld(accountNumber) {
+    const { normalized } = parseAccountNumber(accountNumber);
+    const record = await padronOldRepository.findByClaveApa(normalized);
+    return {
+      normalized,
+      record,
     };
   },
 };

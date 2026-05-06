@@ -1,6 +1,7 @@
 /**
  * Full-page cuenta view — same data shape as the MV3 hint panel (hint-ui.js).
  */
+import { getPadronOld } from "./api.js";
 
 const STYLE_ID = "apa-local-cuenta-styles";
 const SCOPE = ".apa-local-cuenta";
@@ -327,11 +328,70 @@ function createTabPanel(tabId, active) {
   return panel;
 }
 
-function buildOldPadronContent() {
+function formatCurrencySimple(value) {
+  const num =
+    typeof value === "number"
+      ? value
+      : typeof value === "object" && value?.$numberDecimal != null
+        ? parseFloat(value.$numberDecimal)
+        : parseFloat(value);
+  if (Number.isNaN(num)) {
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  }
+  return `$${num.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function buildOldPadronContent(claveApa) {
   const wrap = document.createElement("div");
-  const p = document.createElement("p");
-  p.textContent = "Contenido de padrón (muestra).";
-  wrap.appendChild(p);
+  wrap.className = "apa-padron-old";
+
+  const loading = document.createElement("div");
+  loading.className = "apa-caracteristicas-empty";
+  loading.textContent = "Cargando datos del padrón…";
+  wrap.appendChild(loading);
+
+  getPadronOld(claveApa)
+    .then((body) => {
+      const record = body?.data;
+      wrap.innerHTML = "";
+
+      if (!record) {
+        const empty = document.createElement("div");
+        empty.className = "apa-recibos-empty";
+        empty.textContent = "No se encontraron datos en el padrón para esta cuenta.";
+        wrap.appendChild(empty);
+        return;
+      }
+
+      const container = document.createElement("div");
+      container.style.cssText = "padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;";
+
+      const dl = document.createElement("dl");
+      dl.style.cssText = "margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;";
+
+      const saldoDt = document.createElement("dt");
+      saldoDt.textContent = "Saldo:";
+      saldoDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+      const saldoDd = document.createElement("dd");
+      saldoDd.textContent = formatCurrencySimple(record.saldo);
+      saldoDd.style.cssText = "margin:0;font-size:18px;font-weight:600;color:#0f172a;";
+
+      dl.appendChild(saldoDt);
+      dl.appendChild(saldoDd);
+      container.appendChild(dl);
+
+      wrap.appendChild(container);
+    })
+    .catch((err) => {
+      wrap.innerHTML = "";
+      const error = document.createElement("div");
+      error.className = "apa-caracteristicas-empty";
+      error.style.cssText = "background:#fef2f2;border-color:#fecaca;color:#991b1b;";
+      error.textContent = err?.message || "Error al cargar el padrón.";
+      wrap.appendChild(error);
+    });
+
   return wrap;
 }
 
@@ -361,7 +421,8 @@ function buildTabbedContent(record) {
   recibosPanel.appendChild(buildRecibosContent(record));
 
   const oldPadronPanel = createTabPanel(oldPadronId, false);
-  oldPadronPanel.appendChild(buildOldPadronContent());
+  const claveApa = record?.clave_apa || "";
+  oldPadronPanel.appendChild(buildOldPadronContent(claveApa));
 
   function setActiveTab(target) {
     const isC = target === "caracteristicas";
