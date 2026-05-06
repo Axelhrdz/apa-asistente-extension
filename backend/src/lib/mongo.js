@@ -37,8 +37,6 @@ export async function getRecibosCollections() {
 export async function getPadronOldCollection() {
   const cli = await getMongoClient();
   if (!cli) return null;
-  console.log("[mongo] Connecting to db:", config.mongoDbNameWeb, "collection:", config.mongoCollectionPadronOld);
-  const db = cli.db(config.mongoDbNameWeb);
-  console.log("[mongo] Actual db name:", db.databaseName);
+  const db = cli.db(config.mongoDbNamePadron);
   return db.collection(config.mongoCollectionPadronOld);
 }
