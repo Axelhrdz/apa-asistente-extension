@@ -327,6 +327,14 @@ function createTabPanel(tabId, active) {
   return panel;
 }
 
+function buildOldPadronContent() {
+  const wrap = document.createElement("div");
+  const p = document.createElement("p");
+  p.textContent = "Contenido de padrón (muestra).";
+  wrap.appendChild(p);
+  return wrap;
+}
+
 function buildTabbedContent(record) {
   const frag = document.createDocumentFragment();
 
@@ -336,9 +344,12 @@ function buildTabbedContent(record) {
 
   const caracteristicasId = "apa-local-tab-caracteristicas";
   const recibosId = "apa-local-tab-recibos";
+  const oldPadronId = "apa-local-tab-old-padron";
 
   const caracteristicasBtn = createTabButton("Características", caracteristicasId, true);
   const recibosBtn = createTabButton("Recibos", recibosId, false);
+  const oldPadronBtn = createTabButton("Padron 12 de marzo", oldPadronId, false);
+  tabs.appendChild(oldPadronBtn);
   tabs.appendChild(caracteristicasBtn);
   tabs.appendChild(recibosBtn);
   frag.appendChild(tabs);
@@ -349,22 +360,28 @@ function buildTabbedContent(record) {
   const recibosPanel = createTabPanel(recibosId, false);
   recibosPanel.appendChild(buildRecibosContent(record));
 
+  const oldPadronPanel = createTabPanel(oldPadronId, false);
+  oldPadronPanel.appendChild(buildOldPadronContent());
+
   function setActiveTab(target) {
-    const isCaracteristicas = target === "caracteristicas";
-    caracteristicasBtn.setAttribute(
-      "aria-selected",
-      isCaracteristicas ? "true" : "false"
-    );
-    recibosBtn.setAttribute("aria-selected", isCaracteristicas ? "false" : "true");
-    caracteristicasPanel.classList.toggle("apa-tab-panel--active", isCaracteristicas);
-    recibosPanel.classList.toggle("apa-tab-panel--active", !isCaracteristicas);
+    const isC = target === "caracteristicas";
+    const isR = target === "recibos";
+    const isO = target === "old-padron";
+    caracteristicasBtn.setAttribute("aria-selected", isC ? "true" : "false");
+    recibosBtn.setAttribute("aria-selected", isR ? "true" : "false");
+    oldPadronBtn.setAttribute("aria-selected", isO ? "true" : "false");
+    caracteristicasPanel.classList.toggle("apa-tab-panel--active", isC);
+    recibosPanel.classList.toggle("apa-tab-panel--active", isR);
+    oldPadronPanel.classList.toggle("apa-tab-panel--active", isO);
   }
 
   caracteristicasBtn.addEventListener("click", () => setActiveTab("caracteristicas"));
   recibosBtn.addEventListener("click", () => setActiveTab("recibos"));
+  oldPadronBtn.addEventListener("click", () => setActiveTab("old-padron"));
 
   frag.appendChild(caracteristicasPanel);
   frag.appendChild(recibosPanel);
+  frag.appendChild(oldPadronPanel);
   return frag;
 }
 

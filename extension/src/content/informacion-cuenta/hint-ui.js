@@ -73,9 +73,12 @@ var ApaHintUI = (function () {
 
       R + " .apa-hint-panel .apa-hint-lead{margin:0 0 10px;color:#334155;font-weight:400;}",
 
-      R + " .apa-tabs{display:flex;gap:6px;margin:0 0 10px;}",
-      R + " .apa-tab-btn{appearance:none;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;",
-      "padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;apiBase
+      R + " .apa-tabs{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap;}",
+      R + " .apa-tab-btn{appearance:none;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;}",
+      R + " .apa-tab-btn:hover{background:#eef2f7;color:#1e293b;}",
+      R + " .apa-tab-btn[aria-selected='true']{background:#e2e8f0;border-color:#94a3b8;color:#0f172a;}",
+      R + " .apa-tab-btn:focus-visible{outline:2px solid #2563eb;outline-offset:2px;}",
+      R + " .apa-tab-panel{display:none;}",
       R + " .apa-tab-panel.apa-tab-panel--active{display:block;}",
 
       R + " .apa-hint-clave{margin:0 0 8px;padding:10px 12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;}",
@@ -339,7 +342,7 @@ var ApaHintUI = (function () {
     if (first.estado) {
       var estado = document.createElement("span");
       estado.textContent = first.estado;
-      if (first.estado.toUpperCase() === "PAGADO") {
+      if (String(first.estado).toUpperCase() === "PAGADO") {
         estado.className = "apa-estado-pagado";
       }
       meta.appendChild(estado);
@@ -407,6 +410,16 @@ var ApaHintUI = (function () {
     return wrap;
   }
 
+
+  function buildOldPadronContent() {
+    var wrap = document.createElement("div");
+    wrap.className = "apa-old-padron-placeholder";
+    var p = document.createElement("p");
+    p.textContent = "Contenido de padrón (muestra).";
+    wrap.appendChild(p);
+    return wrap;
+  }
+
   /* ── Tabs ── */
 
   function buildTabbedContent(record) {
@@ -419,8 +432,13 @@ var ApaHintUI = (function () {
     var caracteristicasId = "apa-tab-caracteristicas";
     var recibosId = "apa-tab-recibos";
 
+    var oldPadronId = "apa-tab-old-padron";
+
     var caracteristicasBtn = createTabButton("Caracteristicas", caracteristicasId, true);
     var recibosBtn = createTabButton("Recibos", recibosId, false);
+    var oldPadronBtn = createTabButton("Padron 12 de marzo", oldPadronId, false);
+
+    tabs.appendChild(oldPadronBtn);
     tabs.appendChild(caracteristicasBtn);
     tabs.appendChild(recibosBtn);
     frag.appendChild(tabs);
@@ -431,12 +449,19 @@ var ApaHintUI = (function () {
     var recibosPanel = createTabPanel(recibosId, false);
     recibosPanel.appendChild(buildRecibosContent(record));
 
+    var oldPadronPanel = createTabPanel(oldPadronId, false);
+    oldPadronPanel.appendChild(buildOldPadronContent());
+
     function setActiveTab(target) {
-      var isCaracteristicas = target === "caracteristicas";
-      caracteristicasBtn.setAttribute("aria-selected", isCaracteristicas ? "true" : "false");
-      recibosBtn.setAttribute("aria-selected", isCaracteristicas ? "false" : "true");
-      caracteristicasPanel.classList.toggle("apa-tab-panel--active", isCaracteristicas);
-      recibosPanel.classList.toggle("apa-tab-panel--active", !isCaracteristicas);
+      var isC = target === "caracteristicas";
+      var isR = target === "recibos";
+      var isO = target === "old-padron";
+      caracteristicasBtn.setAttribute("aria-selected", isC ? "true" : "false");
+      recibosBtn.setAttribute("aria-selected", isR ? "true" : "false");
+      oldPadronBtn.setAttribute("aria-selected", isO ? "true" : "false");
+      caracteristicasPanel.classList.toggle("apa-tab-panel--active", isC);
+      recibosPanel.classList.toggle("apa-tab-panel--active", isR);
+      oldPadronPanel.classList.toggle("apa-tab-panel--active", isO);
     }
 
     caracteristicasBtn.addEventListener("click", function () {
@@ -445,9 +470,13 @@ var ApaHintUI = (function () {
     recibosBtn.addEventListener("click", function () {
       setActiveTab("recibos");
     });
+    oldPadronBtn.addEventListener("click", function () {
+      setActiveTab("old-padron");
+    });
 
     frag.appendChild(caracteristicasPanel);
     frag.appendChild(recibosPanel);
+    frag.appendChild(oldPadronPanel);
     return frag;
   }
 

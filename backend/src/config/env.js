@@ -21,8 +21,11 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT) || 3000,
   allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
+
   mongoUri: process.env.MONGODB_URI || null,
   mongoDbName: process.env.MONGO_DB_NAME || "apa_asistente_extension",
+  mongoDbNameWeb: process.env.MONGO_DB_NAME_WEB || "apa_db",
+
   mongoCollectionAccounts:
     process.env.MONGO_COLLECTION_ACCOUNTS || "accounts_rec_banios",
   mongoCollectionRecibos:
@@ -31,4 +34,8 @@ export const config = {
     process.env.MONGO_COLLECTION_RECIBOS,
     "recibos_agua_2025"
   ),
+
+  //Mongo collections for web app
+  mongoCollectionPadronOld: process.env.MONGO_COLLECTION_PADRON_OLD || "padron_old",
+  mongoCollectionUsers: process.env.MONGO_COLLECTION_USERS || "users",
 };
