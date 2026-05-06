@@ -411,12 +411,38 @@ var ApaHintUI = (function () {
   }
 
 
-  function buildOldPadronContent() {
+  function buildOldPadronContent(record) {
     var wrap = document.createElement("div");
-    wrap.className = "apa-old-padron-placeholder";
-    var p = document.createElement("p");
-    p.textContent = "Contenido de padrón (muestra).";
-    wrap.appendChild(p);
+    wrap.className = "apa-padron-old";
+
+    if (!record || !record.padron_old) {
+      var empty = document.createElement("div");
+      empty.className = "apa-recibos-empty";
+      empty.textContent = "No se encontraron datos en el padrón para esta cuenta.";
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    var padron = record.padron_old;
+    var container = document.createElement("div");
+    container.style.cssText = "padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;";
+
+    var dl = document.createElement("dl");
+    dl.style.cssText = "margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;";
+
+    var saldoDt = document.createElement("dt");
+    saldoDt.textContent = "Saldo:";
+    saldoDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var saldoDd = document.createElement("dd");
+    saldoDd.textContent = formatCurrency(padron.saldo);
+    saldoDd.style.cssText = "margin:0;font-size:18px;font-weight:600;color:#0f172a;";
+
+    dl.appendChild(saldoDt);
+    dl.appendChild(saldoDd);
+    container.appendChild(dl);
+    wrap.appendChild(container);
+
     return wrap;
   }
 
@@ -450,7 +476,7 @@ var ApaHintUI = (function () {
     recibosPanel.appendChild(buildRecibosContent(record));
 
     var oldPadronPanel = createTabPanel(oldPadronId, false);
-    oldPadronPanel.appendChild(buildOldPadronContent());
+    oldPadronPanel.appendChild(buildOldPadronContent(record));
 
     function setActiveTab(target) {
       var isC = target === "caracteristicas";

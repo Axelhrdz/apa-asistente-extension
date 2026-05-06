@@ -104,3 +104,8 @@ export function getAccountRecibos(accountNumber) {
   const safe = encodeURIComponent(String(accountNumber || "").trim());
   return apiFetch(`/api/accounts/${safe}/recibos`);
 }
+
+export function getPadronOld(accountNumber) {
+  const safe = encodeURIComponent(String(accountNumber || "").trim());
+  return apiFetch(`/api/accounts/${safe}/padron-old`);
+}

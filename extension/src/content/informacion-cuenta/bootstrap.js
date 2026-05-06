@@ -1,10 +1,11 @@
 /**
- * Content script entry — reads clave from DOM, asks background for account + recibos,
+ * Content script entry — reads clave from DOM, asks background for account + recibos + padron-old,
  * and ALWAYS renders both tabs (each with its own empty state if data is missing).
  */
 (function () {
   var MSG_LOOKUP = "apa/lookup_account";
   var MSG_LOOKUP_RECIBOS = "apa/lookup_recibos";
+  var MSG_LOOKUP_PADRON_OLD = "apa/lookup_padron_old";
   var LOOKUP_TIMEOUT_MS = 7000;
   var LOOKUP_INTERVAL_MS = 350;
   var hasRunLookup = false;
@@ -54,11 +55,12 @@
 
     var accountData = null;
     var recibosData = null;
+    var padronOldData = null;
     var done = 0;
 
     function tryRender() {
       done++;
-      if (done < 2) return;
+      if (done < 3) return;
 
       if (!accountData && !recibosData) {
         ApaHintUI.showError(
@@ -110,9 +112,14 @@
         }
       }
 
+      if (padronOldData && padronOldData.ok && padronOldData.body && padronOldData.body.data) {
+        record.padron_old = padronOldData.body.data;
+      }
+
       var apiBase =
         (accountData && accountData.apiBase) ||
         (recibosData && recibosData.apiBase) ||
+        (padronOldData && padronOldData.apiBase) ||
         "";
       ApaHintUI.showSuccess(clave, record, { apiBase: apiBase });
     }
@@ -124,6 +131,11 @@
 
     sendMsg(MSG_LOOKUP_RECIBOS, clave, function (resp) {
       recibosData = resp;
+      tryRender();
+    });
+
+    sendMsg(MSG_LOOKUP_PADRON_OLD, clave, function (resp) {
+      padronOldData = resp;
       tryRender();
     });
   }

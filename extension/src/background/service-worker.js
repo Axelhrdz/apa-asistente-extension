@@ -1,4 +1,4 @@
-import { getAccountRecibos, getHealth, getResolvedBase, postAccountLookup } from "../lib/api-client.js";
+import { getAccountRecibos, getHealth, getPadronOld, getResolvedBase, postAccountLookup } from "../lib/api-client.js";
 import { MESSAGE_TYPES } from "../lib/messages.js";
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -38,6 +38,35 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === MESSAGE_TYPES.LOOKUP_RECIBOS && message.clave) {
     const clave = String(message.clave).trim();
     Promise.all([getAccountRecibos(clave), getResolvedBase()])
+      .then(([body, apiBase]) => {
+        sendResponse({ ok: true, body, apiBase });
+      })
+      .catch((err) => {
+        getResolvedBase()
+          .then((apiBase) => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+              apiBase,
+            });
+          })
+          .catch(() => {
+            sendResponse({
+              ok: false,
+              message: err.message,
+              status: err.status,
+              data: err.data,
+            });
+          });
+      });
+    return true;
+  }
+
+  if (message?.type === MESSAGE_TYPES.LOOKUP_PADRON_OLD && message.clave) {
+    const clave = String(message.clave).trim();
+    Promise.all([getPadronOld(clave), getResolvedBase()])
       .then(([body, apiBase]) => {
         sendResponse({ ok: true, body, apiBase });
       })
