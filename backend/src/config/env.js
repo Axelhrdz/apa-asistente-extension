@@ -36,7 +36,8 @@ export const config = {
   ),
 
   //Mongo collections for web app
-  mongoDbNamePadron: process.env.MONGO_DB_NAME_PADRON || "apa_db",
+  // NOTE: MongoDB internally converts "apa-db" to "apa_db" but we must use the original name
+  mongoDbNamePadron: process.env.MONGO_DB_NAME_PADRON || "apa-db",
   mongoCollectionPadronOld: process.env.MONGO_COLLECTION_PADRON_OLD || "padron_old",
   mongoCollectionUsers: process.env.MONGO_COLLECTION_USERS || "users",
 };
