@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Check if running as admin (required for creating scheduled tasks)
+:: Check if running as admin
 net session >nul 2>nul
 if %errorlevel% neq 0 (
     echo This script requires administrator privileges to create a scheduled task.
@@ -41,14 +41,14 @@ if %errorlevel% equ 0 (
     schtasks /delete /tn "%TASK_NAME%" /f >nul 2>nul
 )
 
-:: Create the scheduled task to run every 15 minutes
-echo [+] Creating scheduled task (runs every 15 minutes)...
-schtasks /create /tn "%TASK_NAME%" /tr "powershell.exe -ExecutionPolicy Bypass -File \"%PS_SCRIPT%\"" /sc minute /mo 15 /rl HIGHEST /ru SYSTEM /f >nul 2>nul
+:: Create the scheduled task - use cmd /c to avoid PowerShell window popup
+:: This runs completely hidden
+schtasks /create /tn "%TASK_NAME%" /tr "cmd.exe /c powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File \"%PS_SCRIPT%\"" /sc minute /mo 15 /f >nul 2>nul
 
 if %errorlevel% neq 0 (
-    echo ERROR: Failed to create scheduled task. Trying alternative method...
-    :: Try with current user instead of SYSTEM
-    schtasks /create /tn "%TASK_NAME%" /tr "powershell.exe -ExecutionPolicy Bypass -File \"%PS_SCRIPT%\"" /sc minute /mo 15 /f >nul 2>nul
+    echo ERROR: Failed to create scheduled task.
+    echo Trying alternative method...
+    schtasks /create /tn "%TASK_NAME%" /tr "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File \"%PS_SCRIPT%\"" /sc minute /mo 15 /ru SYSTEM /f >nul 2>nul
 )
 
 if %errorlevel% neq 0 (
@@ -58,15 +58,18 @@ if %errorlevel% neq 0 (
 )
 
 echo [+] Scheduled task created successfully!
+echo [+] Task will run every 15 minutes (hidden, no window popup)
 echo.
-echo === Running initial check ===
+
+:: Run initial check - this one will show window to verify it works
+echo === Running initial check (visible window) ===
 powershell.exe -ExecutionPolicy Bypass -File "%PS_SCRIPT%"
 
 echo.
 echo === Installation Complete ===
 echo.
 echo The updater will:
-echo   - Check for updates every 15 minutes
+echo   - Check for updates every 15 minutes (completely hidden)
 echo   - Pull automatically when new commits are available
 echo   - Show a Windows notification when updated
 echo.

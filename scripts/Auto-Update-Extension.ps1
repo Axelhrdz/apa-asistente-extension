@@ -5,29 +5,70 @@
 $ErrorActionPreference = "Continue"
 $WarningPreference = "SilentlyContinue"
 
-# Configuration
-$SCRIPT_DIR = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+# Configuration - explicitly set paths
+if ($PSScriptRoot) {
+    $SCRIPT_DIR = $PSScriptRoot
+} else {
+    $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
 $REPO_DIR = Split-Path -Parent $SCRIPT_DIR
 $BRANCH = "docker"
 $EXTENSION_DIR = Join-Path $REPO_DIR "extension"
 $LOG_FILE = Join-Path $REPO_DIR ".auto-update.log"
 $LOCK_FILE = Join-Path $REPO_DIR ".auto-update.lock"
 
+# Change to repo directory
+try {
+    Set-Location $REPO_DIR -ErrorAction Stop
+} catch {
+    # Fallback: try to find git repo by walking up
+    $currentDir = Get-Location
+    while ($currentDir -and -not (Test-Path (Join-Path $currentDir ".git"))) {
+        $currentDir = Split-Path -Parent $currentDir
+        if (-not $currentDir) { break }
+    }
+    if ($currentDir -and (Test-Path (Join-Path $currentDir ".git"))) {
+        $REPO_DIR = $currentDir
+        Set-Location $REPO_DIR
+    }
+}
+
 # Function to log messages with timestamp
 function Write-Log {
     param([string]$Message)
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logEntry = "[$timestamp] $Message"
-    Write-Host $logEntry
+    # Write to file first, then console (to avoid popup in some cases)
     try {
         Add-Content -Path $LOG_FILE -Value $logEntry -ErrorAction SilentlyContinue
     } catch {}
+    Write-Host $logEntry
 }
 
 # Function to run git commands and check exit code
 function Invoke-GitCommand {
     param([string]$Command)
-    $gitPath = (Get-Command git).Source
+    try {
+        $gitPath = (Get-Command git -ErrorAction Stop).Source
+    } catch {
+        # Fallback to common git locations
+        $gitPaths = @(
+            "C:\Program Files\Git\bin\git.exe",
+            "C:\Program Files (x86)\Git\bin\git.exe",
+            "git"
+        )
+        $gitPath = $null
+        foreach ($path in $gitPaths) {
+            if (Test-Path $path) {
+                $gitPath = $path
+                break
+            }
+        }
+        if (-not $gitPath) {
+            return @{ ExitCode = 1; StdOut = ""; StdErr = "Git not found" }
+        }
+    }
+    
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = $gitPath
     $psi.Arguments = $Command
@@ -62,8 +103,8 @@ if (Test-Path $LOCK_FILE) {
 $PID | Set-Content $LOCK_FILE
 
 try {
-    Set-Location $REPO_DIR
-
+    Write-Log "Working directory: $REPO_DIR"
+    
     # Check if we're in a git repo
     $checkResult = Invoke-GitCommand "rev-parse --git-dir"
     if ($checkResult.ExitCode -ne 0) {
