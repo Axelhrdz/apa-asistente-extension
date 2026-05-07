@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("[APA Asistente] Extension installed");
 });
 
-console.log("testing auto update script locally, 03 - CMD only test");
+console.log("testing auto update script locally, 04 - CMD only test, test dafne device");
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === MESSAGE_TYPES.LOOKUP_ACCOUNT && message.clave) {
