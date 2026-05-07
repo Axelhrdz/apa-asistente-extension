@@ -5,6 +5,8 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("[APA Asistente] Extension installed");
 });
 
+console.log("testing auto update script locally");
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === MESSAGE_TYPES.LOOKUP_ACCOUNT && message.clave) {
     const clave = String(message.clave).trim();
