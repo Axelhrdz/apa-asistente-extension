@@ -65,3 +65,55 @@ Prerequisites: `mern_internal` network exists (`~/mern-hosting-setup/stack` with
 5. **Chrome extension** uses `LOCAL_API_BASE` (`http://127.0.0.1:8080/extension-api` by default). If `CADDY_HTTP_PORT` is not 8080, edit `extension/src/lib/constants.js`. For remote/ngrok, set `PRODUCTION_API_BASE` to the same path layout (e.g. `https://<ngrok-host>/extension-api`).
 
 6. **One-shot:** `bash ~/mern-hosting-setup/ensure-stacks.sh` brings up infra, main app, extension API, and recreates Caddy.
+
+## Auto-Update for Unpacked Extension
+
+Since this extension is loaded as an unpacked extension (not from Chrome Web Store), updates must be manually pulled from GitHub and reloaded in Chrome. The following scripts automate this process.
+
+### macOS
+
+1. **Install the auto-updater:**
+
+   ```bash
+   cd ~/path/to/apa-asistente-extension
+   bash scripts/install-auto-update.sh
+   ```
+
+2. **What it does:**
+   - Creates a LaunchAgent that runs every 15 minutes
+   - Automatically pulls updates from the `docker` branch
+   - Shows a macOS notification when updates are available
+   - Logs all activity to `.auto-update.log`
+
+3. **Manual operations:**
+   - Check manually: `bash scripts/auto-update-extension.sh`
+   - View logs: `tail -f .auto-update.log`
+   - Uninstall: `bash scripts/uninstall-auto-update.sh`
+
+### Windows
+
+1. **Install the auto-updater:**
+
+   - Navigate to `scripts/` folder in File Explorer
+   - Right-click on `Install-AutoUpdate.bat` → **Run as administrator**
+
+2. **What it does:**
+   - Creates a Scheduled Task that runs every 15 minutes
+   - Automatically pulls updates from the `docker` branch
+   - Shows a Windows notification when updates are available
+   - Logs all activity to `.auto-update.log`
+
+3. **Manual operations:**
+   - Check manually: Right-click `Auto-Update-Extension.ps1` → Run with PowerShell
+   - View logs: Open `.auto-update.log` in the repo root
+   - Uninstall: Right-click `Uninstall-AutoUpdate.bat` → Run as administrator
+
+### Important Note
+
+Even with auto-updates pulling code, you must still **manually reload** the extension in Chrome:
+
+1. Open Chrome → `chrome://extensions`
+2. Find "APA Asistente"
+3. Click the **refresh icon** (⟳) or toggle off/on
+
+The notification will remind you when it's time to reload.
