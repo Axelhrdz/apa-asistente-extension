@@ -128,6 +128,6 @@ try {
 } finally {
     # Clean up lock file
     if (Test-Path $LOCK_FILE) {
-        Remove-Item $LOCKFile -Force -ErrorAction SilentlyContinue
+        Remove-Item $LOCK_FILE -Force -ErrorAction SilentlyContinue
     }
 }
