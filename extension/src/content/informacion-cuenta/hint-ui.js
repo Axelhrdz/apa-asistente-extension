@@ -195,6 +195,25 @@ var ApaHintUI = (function () {
     }
   }
 
+  /**
+   * Formats YYYYMM period format (e.g., "202601") to "Enero 2026"
+   * @param {string|number} value - YYYYMM format period
+   * @returns {string} formatted period like "Enero 2026"
+   */
+  function formatPeriodo(value) {
+    if (value === null || value === undefined || value === "") return "—";
+    var str = String(value).trim();
+    if (str.length !== 6) return str;
+    var year = str.substring(0, 4);
+    var monthNum = parseInt(str.substring(4, 6), 10);
+    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return str;
+    var monthNames = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    return monthNames[monthNum - 1] + " " + year;
+  }
+
   function buildClaveRow(record) {
     var wrap = document.createElement("div");
     wrap.className = "apa-hint-clave";
@@ -438,8 +457,28 @@ var ApaHintUI = (function () {
     saldoDd.textContent = formatCurrency(padron.saldo);
     saldoDd.style.cssText = "margin:0;font-size:18px;font-weight:600;color:#0f172a;";
 
+    var periodoDesdeDt = document.createElement("dt");
+    periodoDesdeDt.textContent = "Periodo desde:";
+    periodoDesdeDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var periodoDesdeDd = document.createElement("dd");
+    periodoDesdeDd.textContent = formatPeriodo(padron.periodo_desde);
+    periodoDesdeDd.style.cssText = "margin:0;font-size:14px;font-weight:500;color:#0f172a;";
+
+    var periodoHastaDt = document.createElement("dt");
+    periodoHastaDt.textContent = "Periodo hasta:";
+    periodoHastaDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var periodoHastaDd = document.createElement("dd");
+    periodoHastaDd.textContent = formatPeriodo(padron.periodo_hasta);
+    periodoHastaDd.style.cssText = "margin:0;font-size:14px;font-weight:500;color:#0f172a;";
+
     dl.appendChild(saldoDt);
     dl.appendChild(saldoDd);
+    dl.appendChild(periodoDesdeDt);
+    dl.appendChild(periodoDesdeDd);
+    dl.appendChild(periodoHastaDt);
+    dl.appendChild(periodoHastaDd);
     container.appendChild(dl);
     wrap.appendChild(container);
 
