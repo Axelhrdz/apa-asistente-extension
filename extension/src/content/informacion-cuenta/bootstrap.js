@@ -14,7 +14,7 @@
   }
 
   function isExternalConsultaView() {
-    if (window.location.origin !== "http://172.31.11.87:8080") return false;
+    if (window.location.origin !== "http://172.31.11.87:8080" && window.location.origin !== "http://172.16.71.43:8080") return false;
     if (window.location.pathname !== "/main.php") return false;
     var params = new URLSearchParams(window.location.search);
     return params.get("m") === "2" && params.get("a") === "2" && params.get("ac") === "consulta";
