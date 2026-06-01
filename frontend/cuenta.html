@@ -3,15 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Informacion de cuenta</title>
+    <title>Información de cuenta</title>
   </head>
   <body>
+    <header class="apa-dev-server-banner" role="status">
+      <strong>APA extensión — entorno Linux local</strong>
+      <span
+        >Frontend Vite · API (Caddy):
+        <code id="apa-dev-api-base"></code
+      ></span>
+    </header>
     <main id="informacion-cuenta-root">
-      <h1>Informacion de cuenta</h1>
-      <p>
-        Cuenta:
-        <span id="account-clave-display" data-account-clave></span>
+      <h1 class="cuenta-page-title">Información de cuenta</h1>
+      <p class="cuenta-clave-line">
+        Clave APA: <strong id="account-clave-display" data-account-clave></strong>
       </p>
+      <div id="cuenta-status" class="cuenta-status" hidden></div>
+      <div id="cuenta-content"></div>
     </main>
     <script type="module" src="/src/main-cuenta.js"></script>
   </body>

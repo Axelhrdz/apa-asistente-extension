@@ -1,0 +1,21 @@
+# Extension API — join server_cloud_internal (Mongo + Caddy from ~/server-cloud/stack).
+# Reachable via Caddy, e.g. http://127.0.0.1:8080/extension-api (see CADDY_HTTP_PORT).
+# Prereq: cd ~/server-cloud/stack && docker compose up -d
+# Copy backend/.env.example → backend/.env and set MONGODB_URI (same MONGO_ROOT_* as mern stack).
+services:
+  apa-extension-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: apa-extension-api
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      PORT: "3001"
+    networks:
+      - server_cloud_internal
+
+networks:
+  server_cloud_internal:
+    external: true

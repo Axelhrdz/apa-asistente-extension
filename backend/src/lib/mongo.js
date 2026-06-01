@@ -6,8 +6,9 @@ let client;
 export async function getMongoClient() {
   if (!config.mongoUri) return null;
   if (!client) {
-    client = new MongoClient(config.mongoUri);
-    await client.connect();
+    const next = new MongoClient(config.mongoUri);
+    await next.connect();
+    client = next;
   }
   return client;
 }
@@ -31,4 +32,11 @@ export async function getRecibosCollections() {
   if (!cli) return [];
   const db = cli.db(config.mongoDbName);
   return (config.mongoCollectionRecibosList || []).map((name) => db.collection(name));
+}
+
+export async function getPadronOldCollection() {
+  const cli = await getMongoClient();
+  if (!cli) return null;
+  const db = cli.db(config.mongoDbNamePadron);
+  return db.collection(config.mongoCollectionPadronOld);
 }

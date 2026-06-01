@@ -73,9 +73,8 @@ var ApaHintUI = (function () {
 
       R + " .apa-hint-panel .apa-hint-lead{margin:0 0 10px;color:#334155;font-weight:400;}",
 
-      R + " .apa-tabs{display:flex;gap:6px;margin:0 0 10px;}",
-      R + " .apa-tab-btn{appearance:none;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;",
-      "padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;}",
+      R + " .apa-tabs{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap;}",
+      R + " .apa-tab-btn{appearance:none;border:1px solid #cbd5e1;background:#f8fafc;color:#475569;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease;}",
       R + " .apa-tab-btn:hover{background:#eef2f7;color:#1e293b;}",
       R + " .apa-tab-btn[aria-selected='true']{background:#e2e8f0;border-color:#94a3b8;color:#0f172a;}",
       R + " .apa-tab-btn:focus-visible{outline:2px solid #2563eb;outline-offset:2px;}",
@@ -129,6 +128,16 @@ var ApaHintUI = (function () {
       R + " .apa-concepto-total{color:#0f172a;font-weight:500;white-space:nowrap;}",
 
       R + " .apa-hint-panel .apa-hint-meta{font-size:11px;color:#64748b;margin:8px 0 0;font-weight:400;}",
+      R + " .apa-hint-build{font-size:10px;font-weight:600;color:#64748b;margin:0 0 6px;letter-spacing:.03em;}",
+      R + " .apa-hint-local-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#ecfdf5;color:#047857;border:1px solid #6ee7b7;}",
+      R + " .apa-hint-ngrok-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#eff6ff;color:#1d4ed8;border:1px solid #93c5fd;}",
+      R + " .apa-hint-api-pill{display:inline-block;margin:0 0 8px;padding:4px 8px;border-radius:6px;",
+      "font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;",
+      "background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;}",
       "@media (prefers-reduced-motion:reduce){",
       R + " .apa-hint-flag," + R + " .apa-hint-panel{transition-duration:.01ms;}}",
     ].join("");
@@ -184,6 +193,25 @@ var ApaHintUI = (function () {
     } catch (_) {
       return String(value);
     }
+  }
+
+  /**
+   * Formats YYYYMM period format (e.g., "202601") to "Enero 2026"
+   * @param {string|number} value - YYYYMM format period
+   * @returns {string} formatted period like "Enero 2026"
+   */
+  function formatPeriodo(value) {
+    if (value === null || value === undefined || value === "") return "—";
+    var str = String(value).trim();
+    if (str.length !== 6) return str;
+    var year = str.substring(0, 4);
+    var monthNum = parseInt(str.substring(4, 6), 10);
+    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return str;
+    var monthNames = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    return monthNames[monthNum - 1] + " " + year;
   }
 
   function buildClaveRow(record) {
@@ -333,7 +361,7 @@ var ApaHintUI = (function () {
     if (first.estado) {
       var estado = document.createElement("span");
       estado.textContent = first.estado;
-      if (first.estado.toUpperCase() === "PAGADO") {
+      if (String(first.estado).toUpperCase() === "PAGADO") {
         estado.className = "apa-estado-pagado";
       }
       meta.appendChild(estado);
@@ -401,6 +429,62 @@ var ApaHintUI = (function () {
     return wrap;
   }
 
+
+  function buildOldPadronContent(record) {
+    var wrap = document.createElement("div");
+    wrap.className = "apa-padron-old";
+
+    if (!record || !record.padron_old) {
+      var empty = document.createElement("div");
+      empty.className = "apa-recibos-empty";
+      empty.textContent = "No se encontraron datos en el padrón para esta cuenta.";
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    var padron = record.padron_old;
+    var container = document.createElement("div");
+    container.style.cssText = "padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;";
+
+    var dl = document.createElement("dl");
+    dl.style.cssText = "margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;";
+
+    var saldoDt = document.createElement("dt");
+    saldoDt.textContent = "Saldo:";
+    saldoDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var saldoDd = document.createElement("dd");
+    saldoDd.textContent = formatCurrency(padron.saldo);
+    saldoDd.style.cssText = "margin:0;font-size:18px;font-weight:600;color:#0f172a;";
+
+    var periodoDesdeDt = document.createElement("dt");
+    periodoDesdeDt.textContent = "Periodo desde:";
+    periodoDesdeDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var periodoDesdeDd = document.createElement("dd");
+    periodoDesdeDd.textContent = formatPeriodo(padron.periodo_desde);
+    periodoDesdeDd.style.cssText = "margin:0;font-size:14px;font-weight:500;color:#0f172a;";
+
+    var periodoHastaDt = document.createElement("dt");
+    periodoHastaDt.textContent = "Periodo hasta:";
+    periodoHastaDt.style.cssText = "font-size:13px;font-weight:500;color:#64748b;";
+
+    var periodoHastaDd = document.createElement("dd");
+    periodoHastaDd.textContent = formatPeriodo(padron.periodo_hasta);
+    periodoHastaDd.style.cssText = "margin:0;font-size:14px;font-weight:500;color:#0f172a;";
+
+    dl.appendChild(saldoDt);
+    dl.appendChild(saldoDd);
+    dl.appendChild(periodoDesdeDt);
+    dl.appendChild(periodoDesdeDd);
+    dl.appendChild(periodoHastaDt);
+    dl.appendChild(periodoHastaDd);
+    container.appendChild(dl);
+    wrap.appendChild(container);
+
+    return wrap;
+  }
+
   /* ── Tabs ── */
 
   function buildTabbedContent(record) {
@@ -413,8 +497,13 @@ var ApaHintUI = (function () {
     var caracteristicasId = "apa-tab-caracteristicas";
     var recibosId = "apa-tab-recibos";
 
+    var oldPadronId = "apa-tab-old-padron";
+
     var caracteristicasBtn = createTabButton("Caracteristicas", caracteristicasId, true);
     var recibosBtn = createTabButton("Recibos", recibosId, false);
+    var oldPadronBtn = createTabButton("Padron 12 de marzo", oldPadronId, false);
+
+    tabs.appendChild(oldPadronBtn);
     tabs.appendChild(caracteristicasBtn);
     tabs.appendChild(recibosBtn);
     frag.appendChild(tabs);
@@ -425,12 +514,19 @@ var ApaHintUI = (function () {
     var recibosPanel = createTabPanel(recibosId, false);
     recibosPanel.appendChild(buildRecibosContent(record));
 
+    var oldPadronPanel = createTabPanel(oldPadronId, false);
+    oldPadronPanel.appendChild(buildOldPadronContent(record));
+
     function setActiveTab(target) {
-      var isCaracteristicas = target === "caracteristicas";
-      caracteristicasBtn.setAttribute("aria-selected", isCaracteristicas ? "true" : "false");
-      recibosBtn.setAttribute("aria-selected", isCaracteristicas ? "false" : "true");
-      caracteristicasPanel.classList.toggle("apa-tab-panel--active", isCaracteristicas);
-      recibosPanel.classList.toggle("apa-tab-panel--active", !isCaracteristicas);
+      var isC = target === "caracteristicas";
+      var isR = target === "recibos";
+      var isO = target === "old-padron";
+      caracteristicasBtn.setAttribute("aria-selected", isC ? "true" : "false");
+      recibosBtn.setAttribute("aria-selected", isR ? "true" : "false");
+      oldPadronBtn.setAttribute("aria-selected", isO ? "true" : "false");
+      caracteristicasPanel.classList.toggle("apa-tab-panel--active", isC);
+      recibosPanel.classList.toggle("apa-tab-panel--active", isR);
+      oldPadronPanel.classList.toggle("apa-tab-panel--active", isO);
     }
 
     caracteristicasBtn.addEventListener("click", function () {
@@ -439,9 +535,13 @@ var ApaHintUI = (function () {
     recibosBtn.addEventListener("click", function () {
       setActiveTab("recibos");
     });
+    oldPadronBtn.addEventListener("click", function () {
+      setActiveTab("old-padron");
+    });
 
     frag.appendChild(caracteristicasPanel);
     frag.appendChild(recibosPanel);
+    frag.appendChild(oldPadronPanel);
     return frag;
   }
 
@@ -582,10 +682,52 @@ var ApaHintUI = (function () {
 
   /* ── Public API ── */
 
+  function buildApiPill(apiBase) {
+    if (!apiBase || typeof apiBase !== "string") return null;
+    var pill = document.createElement("p");
+    pill.setAttribute("role", "status");
+    var b = apiBase.toLowerCase();
+    if (
+      b.indexOf("127.0.0.1") !== -1 ||
+      b.indexOf("localhost") !== -1 ||
+      b.indexOf("0.0.0.0") !== -1
+    ) {
+      pill.className = "apa-hint-local-pill";
+      pill.textContent = "API en este equipo · " + apiBase;
+    } else if (b.indexOf("ngrok") !== -1) {
+      pill.className = "apa-hint-ngrok-pill";
+      pill.textContent = "API servidor Linux (ngrok) · " + apiBase;
+    } else {
+      pill.className = "apa-hint-api-pill";
+      pill.textContent = "API · " + apiBase;
+    }
+    return pill;
+  }
+
+  function prependBuildAndApiStrip(panel, options) {
+    var manifest =
+      typeof chrome !== "undefined" &&
+      chrome.runtime &&
+      chrome.runtime.getManifest
+        ? chrome.runtime.getManifest()
+        : null;
+    var buildLine = document.createElement("p");
+    buildLine.className = "apa-hint-build";
+    buildLine.textContent = manifest
+      ? "Extensión v" + manifest.version + " (build Linux / MV3)"
+      : "APA Asistente";
+    panel.appendChild(buildLine);
+
+    var apiBase = options && options.apiBase ? String(options.apiBase) : "";
+    var pill = buildApiPill(apiBase);
+    if (pill) panel.appendChild(pill);
+  }
+
   return {
-    showSuccess: function (_clave, record) {
+    showSuccess: function (_clave, record, options) {
       mountRoot(function (panel) {
         prependPanelHeader(panel, "APA Asistente");
+        prependBuildAndApiStrip(panel, options);
 
         var lead = document.createElement("p");
         lead.className = "apa-hint-lead";
@@ -601,9 +743,10 @@ var ApaHintUI = (function () {
       }, "success");
     },
 
-    showError: function (clave, status, message, data) {
+    showError: function (clave, status, message, data, options) {
       mountRoot(function (panel) {
         prependPanelHeader(panel, "APA Asistente");
+        prependBuildAndApiStrip(panel, options || {});
 
         var p = document.createElement("p");
         p.className = "apa-hint-lead";

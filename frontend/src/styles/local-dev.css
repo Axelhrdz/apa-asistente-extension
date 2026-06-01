@@ -1,0 +1,115 @@
+/* Page chrome for Vite dev — extension UI styles are injected by render-cuenta.js */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.apa-dev-server-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #1e3a5f 0%, #0f766e 100%);
+  color: #ecfeff;
+  font-size: 13px;
+}
+
+.apa-dev-server-banner strong {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.apa-dev-server-banner span {
+  opacity: 0.92;
+  font-weight: 400;
+}
+
+.apa-dev-server-banner code {
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+main {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+[data-page="ingreso-clave"] main label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+[data-page="ingreso-clave"] main input {
+  width: 100%;
+  max-width: 20rem;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+[data-page="ingreso-clave"] main button {
+  margin-top: 14px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #0d9488;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+[data-page="ingreso-clave"] main button:hover {
+  background: #0f766e;
+}
+
+.cuenta-page-title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.cuenta-status {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.cuenta-status--loading {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.cuenta-status--error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+}
+
+.cuenta-clave-line {
+  margin: 0 0 16px;
+  color: #475569;
+}
+
+.cuenta-clave-line strong {
+  color: #0f172a;
+}

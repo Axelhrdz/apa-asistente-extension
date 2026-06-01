@@ -5,6 +5,22 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { apiRouter } from "./routes/index.js";
 
+function isNgrokOrigin(origin) {
+  if (!origin) return false;
+  try {
+    const host = new URL(origin).hostname.toLowerCase();
+    return (
+      host.endsWith(".ngrok-free.app") ||
+      host.endsWith(".ngrok-free.dev") ||
+      host.endsWith(".ngrok.app") ||
+      host.endsWith(".ngrok.io") ||
+      host.endsWith(".ngrok.dev")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function createApp() {
   const app = express();
 
@@ -16,6 +32,7 @@ export function createApp() {
         if (!origin) return cb(null, true);
         // Background fetch from the MV3 service worker sends Origin: chrome-extension://…
         if (origin.startsWith("chrome-extension://")) return cb(null, true);
+        if (isNgrokOrigin(origin)) return cb(null, true);
         if (config.allowedOrigins.length === 0) return cb(null, true);
         if (config.allowedOrigins.includes(origin)) return cb(null, true);
         const err = new Error("Not allowed by CORS");
